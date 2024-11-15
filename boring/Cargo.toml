@@ -1,11 +1,11 @@
 [package]
-name = "rboring"
+name = "boring2"
 version = { workspace = true }
 authors = ["Steven Fackler <sfackler@gmail.com>", "Ivan Nikulin <ifaaan@gmail.com>"]
 license = "Apache-2.0"
 description = "BoringSSL bindings"
 repository = { workspace = true }
-documentation = "https://docs.rs/rboring"
+documentation = "https://docs.rs/boring2"
 readme = "README.md"
 keywords = ["crypto", "tls", "ssl", "dtls"]
 categories = ["cryptography", "api-bindings"]
