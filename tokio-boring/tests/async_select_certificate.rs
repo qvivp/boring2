@@ -1,4 +1,4 @@
-use tokio_rboring as tokio_boring;
+use tokio_boring2 as tokio_boring;
 
 use boring::ssl::ClientHello;
 use futures::future;
