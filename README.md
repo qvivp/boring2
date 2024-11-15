@@ -1,6 +1,6 @@
 # boring
 
-[![crates.io](https://img.shields.io/crates/v/boring.svg)](https://crates.io/crates/boring2)
+[![crates.io](https://img.shields.io/crates/v/boring2.svg)](https://crates.io/crates/boring2)
 
 BoringSSL bindings for the Rust programming language and TLS adapters for [tokio](https://github.com/tokio-rs/tokio)
 and [hyper](https://github.com/hyperium/hyper) built on top of it.
