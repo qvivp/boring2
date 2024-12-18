@@ -708,9 +708,9 @@ impl SslCurve {
 
     pub const X25519: SslCurve = SslCurve(ffi::SSL_CURVE_X25519 as _);
 
-    pub const FFDHE2048: SslCurve = SslCurve(ffi::SSL_CURVE_FFDHE2048 as _);
+    pub const FFDHE2048: SslCurve = SslCurve(ffi::SSL_CURVE_DHE2048 as _);
 
-    pub const FFDHE3072: SslCurve = SslCurve(ffi::SSL_CURVE_FFDHE3072 as _);
+    pub const FFDHE3072: SslCurve = SslCurve(ffi::SSL_CURVE_DHE3072 as _);
 
     #[cfg(not(feature = "fips"))]
     pub const X25519_KYBER768_DRAFT00: SslCurve =
@@ -774,6 +774,8 @@ impl SslCurve {
             ffi::SSL_CURVE_P256_KYBER768_DRAFT00 => Some(ffi::NID_P256Kyber768Draft00),
             #[cfg(feature = "pq-experimental")]
             ffi::SSL_CURVE_X25519_MLKEM768 => Some(ffi::NID_X25519MLKEM768),
+            ffi::SSL_CURVE_DHE2048 => Some(ffi::NID_ffdhe2048),
+            ffi::SSL_CURVE_DHE3072 => Some(ffi::NID_ffdhe3072),
             _ => None,
         }
     }
