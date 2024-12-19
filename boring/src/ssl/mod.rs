@@ -1888,6 +1888,60 @@ impl SslContextBuilder {
         unsafe { ffi::SSL_CTX_set_key_shares_limit(self.as_ptr(), limit as _) }
     }
 
+    #[corresponds(SSL_CTX_set_extension_permutation)]
+    #[cfg(not(feature = "fips-compat"))]
+    pub fn set_extension_permutation(
+        &mut self,
+        shuffled: &[ExtensionType],
+    ) -> Result<(), ErrorStack> {
+        const BORING_SSLEXTENSION_PERMUTATION: [ExtensionType; 25] = [
+            ExtensionType::SERVER_NAME,
+            ExtensionType::ENCRYPTED_CLIENT_HELLO,
+            ExtensionType::EXTENDED_MASTER_SECRET,
+            ExtensionType::RENEGOTIATE,
+            ExtensionType::SUPPORTED_GROUPS,
+            ExtensionType::EC_POINT_FORMATS,
+            ExtensionType::SESSION_TICKET,
+            ExtensionType::APPLICATION_LAYER_PROTOCOL_NEGOTIATION,
+            ExtensionType::STATUS_REQUEST,
+            ExtensionType::SIGNATURE_ALGORITHMS,
+            ExtensionType::NEXT_PROTO_NEG,
+            ExtensionType::CERTIFICATE_TIMESTAMP,
+            ExtensionType::CHANNEL_ID,
+            ExtensionType::SRTP,
+            ExtensionType::KEY_SHARE,
+            ExtensionType::PSK_KEY_EXCHANGE_MODES,
+            ExtensionType::EARLY_DATA,
+            ExtensionType::SUPPORTED_VERSIONS,
+            ExtensionType::COOKIE,
+            ExtensionType::QUIC_TRANSPORT_PARAMETERS_STANDARD,
+            ExtensionType::QUIC_TRANSPORT_PARAMETERS_LEGACY,
+            ExtensionType::CERT_COMPRESSION,
+            ExtensionType::DELEGATED_CREDENTIAL,
+            ExtensionType::APPLICATION_SETTINGS,
+            ExtensionType::RECORD_SIZE_LIMIT,
+        ];
+
+        let mut indices = Vec::with_capacity(shuffled.len());
+        for &ext in shuffled {
+            if let Some(index) = BORING_SSLEXTENSION_PERMUTATION
+                .iter()
+                .position(|&e| e == ext)
+            {
+                indices.push(index as u8);
+            }
+        }
+        
+        unsafe {
+            cvt(ffi::SSL_CTX_set_extension_permutation(
+                self.as_ptr(),
+                indices.as_ptr() as *const _,
+                indices.len() as _,
+            ))
+            .map(|_| ())
+        }
+    }
+
     /// Configures whether ClientHello extensions should be permuted.
     ///
     /// Note: This is gated to non-fips because the fips feature builds with a separate
