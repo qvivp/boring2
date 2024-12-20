@@ -597,20 +597,6 @@ impl ExtensionType {
         ExtensionType::APPLICATION_SETTINGS,
         ExtensionType::RECORD_SIZE_LIMIT,
     ];
-
-    fn has_duplicates(indices: &[u8]) -> bool {
-        if indices.len() > ExtensionType::BORING_SSLEXTENSION_PERMUTATION.len() {
-            return true;
-        }
-        for i in 0..indices.len() {
-            for j in i + 1..indices.len() {
-                if indices[i] == indices[j] {
-                    return true;
-                }
-            }
-        }
-        false
-    }
 }
 
 impl From<u16> for ExtensionType {
@@ -1934,12 +1920,18 @@ impl SslContextBuilder {
     /// Sets the indices of the extensions to be permuted.
     ///
     /// The indices must be in the range [0, 25).
+    /// Extension duplication will be verified by the user. 
+    /// If duplication occurs, TLS connection failure may occur.
     #[corresponds(SSL_CTX_set_extension_permutation)]
     #[cfg(not(feature = "fips-compat"))]
     pub fn set_extension_permutation(
         &mut self,
         shuffled: &[ExtensionType],
     ) -> Result<(), ErrorStack> {
+        if shuffled.len() > ExtensionType::BORING_SSLEXTENSION_PERMUTATION.len() {
+            return Ok(());
+        }
+
         let mut indices = Vec::with_capacity(shuffled.len());
         for &ext in shuffled {
             if let Some(index) = ExtensionType::BORING_SSLEXTENSION_PERMUTATION
@@ -1948,10 +1940,6 @@ impl SslContextBuilder {
             {
                 indices.push(index as u8);
             }
-        }
-        
-        if ExtensionType::has_duplicates(&indices) {
-            return Ok(());
         }
 
         unsafe {
@@ -1967,10 +1955,12 @@ impl SslContextBuilder {
     /// Sets the indices of the extensions to be permuted.
     ///
     /// The indices must be in the range [0, 25).
+    /// Extension duplication will be verified by the user. 
+    /// If duplication occurs, TLS connection failure may occur.
     #[corresponds(SSL_CTX_set_extension_permutation)]
     #[cfg(not(feature = "fips-compat"))]
     pub fn set_extension_permutation_indices(&mut self, indices: &[u8]) -> Result<(), ErrorStack> {
-        if ExtensionType::has_duplicates(&indices) {
+        if indices.len() > ExtensionType::BORING_SSLEXTENSION_PERMUTATION.len() {
             return Ok(());
         }
 
