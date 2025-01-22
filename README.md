@@ -10,7 +10,9 @@ This package is focused solely on implementing the TLS extensions spec. It suppo
 
 * Safari required TLS extensions
 * Firefox required TLS extensions
-* `kDHE` && `ffdhe2048`/`ffdhe3072` implementations
+* `kDHE` & `ffdhe2048`/`ffdhe3072` implementations
+
+## Contribution
 
 Unless you explicitly state otherwise, any contribution intentionally
 submitted for inclusion in the work by you, as defined in the Apache-2.0
