@@ -1,8 +1,8 @@
-# boring
+# boring2
 
 [![crates.io](https://img.shields.io/crates/v/boring2.svg)](https://crates.io/crates/boring2)
 
-BoringSSL bindings are available for the Rust programming language, and the [HTTP Client](https://github.com/0x676e67/rquest) is built on top of it.
+BoringSSL bindings are available for the Rust programming language, and the HTTP [Client](https://github.com/0x676e67/rquest) is built on top of it.
 
 ## Non-goals
 
