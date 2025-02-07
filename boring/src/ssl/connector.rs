@@ -1,13 +1,16 @@
 use std::io::{Read, Write};
 use std::ops::{Deref, DerefMut};
 
+use foreign_types::ForeignTypeRef;
+use openssl_macros::corresponds;
+
 use crate::dh::Dh;
 use crate::error::ErrorStack;
 use crate::ssl::{
     HandshakeError, Ssl, SslContext, SslContextBuilder, SslContextRef, SslMethod, SslMode,
     SslOptions, SslRef, SslStream, SslVerifyMode,
 };
-use crate::version;
+use crate::{cvt, version};
 use std::net::IpAddr;
 
 use super::MidHandshakeSslStream;
@@ -24,13 +27,13 @@ ssbzSibBsu/6iGtCOGEoXJf//////////wIBAg==
 ";
 
 enum ContextType {
-    WithMethod(SslMethod)
+    WithMethod(SslMethod),
 }
 
 #[allow(clippy::inconsistent_digit_grouping)]
 fn ctx(ty: ContextType) -> Result<SslContextBuilder, ErrorStack> {
     let mut ctx = match ty {
-        ContextType::WithMethod(method) => SslContextBuilder::new(method)
+        ContextType::WithMethod(method) => SslContextBuilder::new(method),
     }?;
 
     let mut opts = SslOptions::ALL
@@ -253,6 +256,63 @@ impl ConnectConfiguration {
         self.setup_connect(domain, stream)
             .map_err(HandshakeError::SetupFailure)?
             .handshake()
+    }
+}
+
+impl ConnectConfiguration {
+    /// Enables or disables ECH grease.
+    ///
+    /// # Arguments
+    ///
+    /// * `enable` - A boolean indicating whether to enable ECH grease.
+    ///
+    /// # Safety
+    ///
+    /// This function is unsafe because it calls an FFI function.
+    #[corresponds(SSL_set_enable_ech_grease)]
+    pub fn set_enable_ech_grease(&mut self, enable: bool) {
+        unsafe { ffi::SSL_set_enable_ech_grease(self.as_ptr(), enable as _) }
+    }
+
+    /// Adds application settings.
+    ///
+    /// # Arguments
+    ///
+    /// * `alps` - A slice of bytes representing the application settings.
+    ///
+    /// # Returns
+    ///
+    /// * `Result<(), ErrorStack>` - Returns `Ok(())` if the operation is successful, otherwise returns an `ErrorStack`.
+    ///
+    /// # Safety
+    ///
+    /// This function is unsafe because it calls an FFI function.
+    #[corresponds(SSL_add_application_settings)]
+    pub fn add_application_settings(&mut self, alps: &[u8]) -> Result<(), ErrorStack> {
+        unsafe {
+            cvt(ffi::SSL_add_application_settings(
+                self.as_ptr(),
+                alps.as_ptr(),
+                alps.len(),
+                std::ptr::null(),
+                0,
+            ))
+            .map(|_| ())
+        }
+    }
+
+    /// Sets the ALPS use new codepoint flag.
+    ///
+    /// # Arguments
+    ///
+    /// * `use_new` - A boolean indicating whether to use the new codepoint.
+    ///
+    /// # Safety
+    ///
+    /// This function is unsafe because it calls an FFI function.
+    #[corresponds(SSL_set_alps_use_new_codepoint)]
+    pub fn set_alps_use_new_codepoint(&mut self, use_new: bool) {
+        unsafe { ffi::SSL_set_alps_use_new_codepoint(self.as_ptr(), use_new as _) }
     }
 }
 
