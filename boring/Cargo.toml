@@ -30,13 +30,6 @@ fips-compat = []
 # Link with precompiled FIPS-validated `bcm.o` module.
 fips-link-precompiled = ["boring-sys/fips-link-precompiled"]
 
-# Enables Raw public key API (https://datatracker.ietf.org/doc/html/rfc7250)
-# This feature is necessary in order to compile the bindings for the
-# default branch of boringSSL. Alternatively, a version of boringSSL that
-# implements the same feature set can be provided by setting
-# `BORING_BSSL{,_FIPS}_SOURCE_PATH` and `BORING_BSSL{,_FIPS}_ASSUME_PATCHED`.
-rpk = ["boring-sys/rpk"]
-
 # Applies a patch to the boringSSL source code that enables support for PQ key
 # exchange. This feature is necessary in order to compile the bindings for the
 # default branch of boringSSL. Alternatively, a version of boringSSL that
