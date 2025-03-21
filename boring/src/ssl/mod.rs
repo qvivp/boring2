@@ -765,10 +765,6 @@ impl SslCurve {
 
     pub const FFDHE3072: SslCurve = SslCurve(ffi::SSL_CURVE_DHE3072 as _);
 
-    #[cfg(not(feature = "fips"))]
-    pub const X25519_KYBER768_DRAFT00: SslCurve =
-        SslCurve(ffi::SSL_CURVE_X25519_KYBER768_DRAFT00 as _);
-
     #[cfg(feature = "pq-experimental")]
     pub const X25519_MLKEM768: SslCurve = SslCurve(ffi::SSL_CURVE_X25519_MLKEM768 as _);
 
