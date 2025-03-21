@@ -15,6 +15,10 @@ env:
   RUSTFLAGS: -Dwarnings
   RUST_BACKTRACE: 1
 
+permissions:
+  contents: write
+  packages: write
+
 jobs:
   rustfmt:
     name: rustfmt
@@ -178,19 +182,19 @@ jobs:
             CPLUS_INCLUDE_PATH: "C:\\msys64\\usr\\include"
             LIBRARY_PATH: "C:\\msys64\\usr\\lib"
           # CI's Windows doesn't have required root certs
-          extra_test_args: --workspace --exclude tokio-boring --exclude hyper-boring
+          extra_test_args: --workspace --exclude tokio-boring2 --exclude hyper-boring2
         - thing: i686-msvc
           target: i686-pc-windows-msvc
           rust: stable-x86_64-msvc
           os: windows-latest
           # CI's Windows doesn't have required root certs
-          extra_test_args: --workspace --exclude tokio-boring --exclude hyper-boring
+          extra_test_args: --workspace --exclude tokio-boring2 --exclude hyper-boring2
         - thing: x86_64-msvc
           target: x86_64-pc-windows-msvc
           rust: stable-x86_64-msvc
           os: windows-latest
           # CI's Windows doesn't have required root certs
-          extra_test_args: --workspace --exclude tokio-boring --exclude hyper-boring
+          extra_test_args: --workspace --exclude tokio-boring2 --exclude hyper-boring2
 
     steps:
     - uses: actions/checkout@v4
@@ -230,55 +234,19 @@ jobs:
       run: cargo test --target ${{ matrix.target }} ${{ matrix.extra_test_args }}
       shell: bash
       env: ${{ matrix.custom_env }}
-    - name: Test boring-sys cargo publish
+    - name: Test boring-sys2 cargo publish
       # Running `cargo publish --dry-run` tests two things:
       #
-      # 1. That `boring-sys` can build BoringSSL with just the files included
+      # 1. That `boring-sys2` can build BoringSSL with just the files included
       #    in the crates.io package (as determined by the `include` field in
       #    the `Cargo.toml`).
-      # 2. That the final `boring-sys` package size, including the BoringSSL
+      # 2. That the final `boring-sys2` package size, including the BoringSSL
       #    submodules, is not too large to be published to `crates.io`.
       #
       # Both of these may no longer be the case after updating the BoringSSL
       # submodules to a new revision, so it's important to test this on CI.
-      run: cargo publish --dry-run -p boring-sys
+      run: cargo publish --dry-run -p boring-sys2
 
-  test-fips:
-    name: Test FIPS integration
-    runs-on: ubuntu-20.04
-    steps:
-    - uses: actions/checkout@v4
-      with:
-        submodules: 'recursive'
-    - name: Install Rust (rustup)
-      run: rustup update stable --no-self-update && rustup default stable
-      shell: bash
-    - name: Install Clang-12
-      uses: KyleMayes/install-llvm-action@v1
-      with:
-        version: "12.0.0"
-        directory: ${{ runner.temp }}/llvm
-    - name: Install golang
-      uses: actions/setup-go@v5
-      with:
-        go-version: '>=1.22.0'
-    - name: Add clang++-12 link
-      working-directory: ${{ runner.temp }}/llvm/bin
-      run: ln -s clang clang++-12
-    - name: Run tests
-      run: cargo test --features fips
-    - name: Test boring-sys cargo publish (FIPS)
-      # Running `cargo publish --dry-run` tests two things:
-      #
-      # 1. That `boring-sys` can build BoringSSL with just the files included
-      #    in the crates.io package (as determined by the `include` field in
-      #    the `Cargo.toml`).
-      # 2. That the final `boring-sys` package size, including the BoringSSL
-      #    submodules, is not too large to be published to `crates.io`.
-      #
-      # Both of these may no longer be the case after updating the BoringSSL
-      # submodules to a new revision, so it's important to test this on CI.
-      run: cargo publish --dry-run -p boring-sys --features fips
 
   cross-build:
     name: Cross build from macOS to Linux
@@ -304,45 +272,6 @@ jobs:
     - name: Build for ${{ matrix.target }}
       run: cargo build --target ${{ matrix.target }} --all-targets
 
-  cross-build-fips:
-    name: Cross build from macOS to Linux (FIPS)
-    runs-on: macos-13 # Need an Intel (x86_64) runner for Clang 12.0.0
-    strategy:
-      matrix:
-        include:
-          - target: x86_64-unknown-linux-gnu
-    steps:
-    - uses: actions/checkout@v4
-      with:
-        submodules: 'recursive'
-    - name: Install Rust (rustup)
-      run: rustup update stable --no-self-update && rustup default stable && rustup target add ${{ matrix.target }}
-      shell: bash
-    - name: Install golang
-      uses: actions/setup-go@v5
-      with:
-        go-version: '>=1.22.0'
-    - name: Install ${{ matrix.target }} toolchain
-      run: brew tap messense/macos-cross-toolchains && brew install ${{ matrix.target }} && brew link x86_64-unknown-linux-gnu
-    - name: Install Clang-12
-      uses: KyleMayes/install-llvm-action@v1
-      with:
-        version: "12.0.0"
-        directory: ${{ runner.temp }}/llvm
-    - name: Add clang++-12 link
-      working-directory: ${{ runner.temp }}/llvm/bin
-      run: ln -s clang++ clang++-12
-    - name: Set BORING_BSSL_FIPS_COMPILER_EXTERNAL_TOOLCHAIN
-      run: echo "BORING_BSSL_FIPS_COMPILER_EXTERNAL_TOOLCHAIN=$(brew --prefix ${{ matrix.target }})/toolchain" >> $GITHUB_ENV
-      shell: bash
-    - name: Set BORING_BSSL_FIPS_SYSROOT
-      run: echo "BORING_BSSL_FIPS_SYSROOT=$BORING_BSSL_FIPS_COMPILER_EXTERNAL_TOOLCHAIN/${{ matrix.target }}/sysroot" >> $GITHUB_ENV
-      shell: bash
-    - name: Set CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER
-      run: echo "CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER=${{ matrix.target }}-gcc" >> $GITHUB_ENV
-    - name: Build for ${{ matrix.target }}
-      run: cargo build --target ${{ matrix.target }} --all-targets --features fips
-
   test-features:
     name: Test features
     runs-on: ubuntu-20.04
@@ -352,22 +281,33 @@ jobs:
         submodules: 'recursive'
     - name: Install Rust (rustup)
       run: rustup update stable --no-self-update && rustup default stable
-      shell: bash
-    - run: cargo test --features rpk
-      name: Run `rpk` tests
     - run: cargo test --features pq-experimental
       name: Run `pq-experimental` tests
-    - run: cargo test --features underscore-wildcards
-      name: Run `underscore-wildcards` tests
-    - run: cargo test --features pq-experimental,rpk
-      name: Run `pq-experimental,rpk` tests
     - run: cargo test --features kx-safe-default,pq-experimental
       name: Run `kx-safe-default` tests
     - run: cargo test --features pq-experimental,underscore-wildcards
       name: Run `pq-experimental,underscore-wildcards` tests
-    - run: cargo test --features rpk,underscore-wildcards
-      name: Run `rpk,underscore-wildcards` tests
-    - run: cargo test --features pq-experimental,rpk,underscore-wildcards
-      name: Run `pq-experimental,rpk,underscore-wildcards` tests
-    - run: cargo test -p hyper-boring --features hyper1
-      name: Run hyper 1.0 tests for hyper-boring
+    - run: cargo test --features underscore-wildcards
+      name: Run `underscore-wildcards` tests
+
+  crates:
+    name: crates
+    needs: [rustfmt, clippy, test, cross-build, test-features]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+      - name: publish crates
+        run: |
+          cargo login ${{ secrets.CARGO_REGISTRY_TOKEN }}
+          ./scripts/publish.sh
+      - name: Upload binaries to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          prerelease: ${{ contains(github.ref, 'alpha') || contains(github.ref, 'beta') || contains(github.ref, 'rc') }}
+          generate_release_notes: true
