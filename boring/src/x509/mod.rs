@@ -148,6 +148,12 @@ impl X509StoreContextRef {
         unsafe { X509VerifyParamRef::from_ptr_mut(ffi::X509_STORE_CTX_get0_param(self.as_ptr())) }
     }
 
+    /// Sets the X509 verifification configuration on the X509_STORE_CTX.
+    #[corresponds(X509_STORE_CTX_set0_param)]
+    pub fn set_verify_param(&mut self, param: &mut X509VerifyParamRef) {
+        unsafe { ffi::X509_STORE_CTX_set0_param(self.as_ptr(), param.as_ptr()) }
+    }
+
     /// Verifies the stored certificate.
     ///
     /// Returns `true` if verification succeeds. The `error` method will return the specific
@@ -206,6 +212,20 @@ impl X509StoreContextRef {
                 None
             } else {
                 Some(StackRef::from_ptr(chain))
+            }
+        }
+    }
+
+    /// Returns a reference to the certificate being verified.
+    /// May return None if a raw public key is being verified.
+    #[corresponds(X509_STORE_CTX_get0_cert)]
+    pub fn cert(&self) -> Option<&X509Ref> {
+        unsafe {
+            let ptr = ffi::X509_STORE_CTX_get0_cert(self.as_ptr());
+            if ptr.is_null() {
+                None
+            } else {
+                Some(X509Ref::from_ptr(ptr))
             }
         }
     }
