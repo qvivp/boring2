@@ -112,7 +112,7 @@ pub use self::cert_compression::CertCompressionAlgorithm;
 pub use self::connector::{
     ConnectConfiguration, SslAcceptor, SslAcceptorBuilder, SslConnector, SslConnectorBuilder,
 };
-#[cfg(not(any(feature = "fips", feature = "fips-no-compat")))]
+#[cfg(not(feature = "fips"))]
 pub use self::ech::SslEchKeysRef;
 pub use self::error::{Error, ErrorCode, HandshakeError};
 
