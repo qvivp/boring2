@@ -71,6 +71,7 @@ impl X509StoreBuilder {
     }
 
     /// Constructs the `X509Store`.
+    #[must_use]
     pub fn build(self) -> X509Store {
         let store = X509Store(self.0);
         mem::forget(self);
@@ -115,6 +116,14 @@ impl X509StoreBuilderRef {
     pub fn set_param(&mut self, param: &X509VerifyParamRef) -> Result<(), ErrorStack> {
         unsafe { cvt(ffi::X509_STORE_set1_param(self.as_ptr(), param.as_ptr())).map(|_| ()) }
     }
+
+    /// For testing only
+    #[cfg(test)]
+    pub fn objects_len(&self) -> usize {
+        unsafe {
+            StackRef::<X509Object>::from_ptr(ffi::X509_STORE_get0_objects(self.as_ptr())).len()
+        }
+    }
 }
 
 foreign_type_and_impl_send_sync! {
@@ -153,6 +162,7 @@ impl X509StoreRef {
         note = "This method is unsound https://github.com/sfackler/rust-openssl/issues/2096"
     )]
     #[corresponds(X509_STORE_get0_objects)]
+    #[must_use]
     pub fn objects(&self) -> &StackRef<X509Object> {
         unsafe { StackRef::from_ptr(ffi::X509_STORE_get0_objects(self.as_ptr())) }
     }
@@ -160,6 +170,7 @@ impl X509StoreRef {
     /// For testing only, where it doesn't have to expose an unsafe pointer
     #[cfg(test)]
     #[allow(deprecated)]
+    #[must_use]
     pub fn objects_len(&self) -> usize {
         self.objects().len()
     }
