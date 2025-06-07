@@ -454,22 +454,6 @@ static SSL_INDEXES: LazyLock<Mutex<HashMap<TypeId, c_int>>> =
     LazyLock::new(|| Mutex::new(HashMap::new()));
 static SESSION_CTX_INDEX: LazyLock<Index<Ssl, SslContext>> =
     LazyLock::new(|| Ssl::new_ex_index().unwrap());
-#[cfg(feature = "rpk")]
-static RPK_FLAG_INDEX: LazyLock<Index<SslContext, bool>> =
-    LazyLock::new(|| SslContext::new_ex_index().unwrap());
-
-unsafe extern "C" fn free_data_box<T>(
-    _parent: *mut c_void,
-    ptr: *mut c_void,
-    _ad: *mut ffi::CRYPTO_EX_DATA,
-    _idx: c_int,
-    _argl: c_long,
-    _argp: *mut c_void,
-) {
-    if !ptr.is_null() {
-        drop(Box::<T>::from_raw(ptr as *mut T));
-    }
-}
 
 /// An error returned from the SNI callback.
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
