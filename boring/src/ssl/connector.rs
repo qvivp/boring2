@@ -287,7 +287,7 @@ impl ConnectConfiguration {
         unsafe { ffi::SSL_set_aes_hw_override(self.as_ptr(), enable as _) }
     }
 
-    /// Sets whether the aes chacha20 preference should be enabled.
+    /// Sets whether the ChaCha20 preference should be enabled.
     ///
     /// Controls the priority of TLS 1.3 cipher suites. When set to `true`, the client prefers:
     /// AES_128_GCM, CHACHA20_POLY1305, then AES_256_GCM. Useful in environments with specific
