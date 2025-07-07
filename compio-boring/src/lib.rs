@@ -181,8 +181,6 @@ impl<S: AsyncRead> AsyncRead for SslStream<S> {
             }
         }
     }
-
-    // OpenSSL does not support vectored reads
 }
 
 /// `AsyncRead` is needed for shutting down stream.
