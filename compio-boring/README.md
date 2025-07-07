@@ -1,8 +1,8 @@
-# tokio-boring2
+# compio-boring2
 
 An implementation of SSL streams for Tokio built on top of the BoringSSL.
 
-[Documentation](https://docs.rs/tokio-boring2)
+[Documentation](https://docs.rs/compio-boring2)
 
 ## Usage
 
@@ -10,14 +10,14 @@ First, add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-tokio-boring2 = "5.0.0"
+tcompio-boring2 = "5.0.0-alpha.4"
 ```
 
 Then, use either `accept` or `connect` as appropriate.
 
 ```rust
 use boring::ssl;
-use tokio::net::TcpListener;
+use compio::net::TcpListener;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -29,7 +29,7 @@ async fn main() -> anyhow::Result<()> {
     ssl_builder.set_default_verify_paths()?;
     ssl_builder.set_verify(ssl::SslVerifyMode::PEER);
     let acceptor = ssl_builder.build();
-    let _ssl_stream = tokio_boring2::accept(&acceptor, tcp_stream).await?;
+    let _ssl_stream = compio_boring2::accept(&acceptor, tcp_stream).await?;
     Ok(())
 }
 ```
@@ -40,7 +40,7 @@ negotiating the connection. Each TLS stream implements the `Read` and
 ecosystem. Client connections initiated from this crate verify hostnames
 automatically and by default.
 
-`tokio-boring2` exports this ability through [`accept`] and [`connect`]. `accept` should
+`compio-boring2` exports this ability through [`accept`] and [`connect`]. `accept` should
 be used by servers, and `connect` by clients. These augment the functionality provided by the
 [`boring2`] crate, on which this crate is built. Configuration of TLS parameters is still
 primarily done through the [`boring2`] crate.
@@ -61,7 +61,3 @@ at your option.
 Unless you explicitly state otherwise, any contribution intentionally submitted
 for inclusion in Serde by you, as defined in the Apache-2.0 license, shall be
 dual licensed as above, without any additional terms or conditions.
-
-## Accolades
-
-The project is based on a fork of [tokio-openssl](https://github.com/sfackler/tokio-openssl).
