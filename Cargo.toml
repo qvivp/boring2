@@ -8,7 +8,7 @@ members = [
 resolver = "2"
 
 [workspace.package]
-version = "5.0.0-alpha.3"
+version = "5.0.0-alpha.4"
 repository = "https://github.com/0x676e67/boring2"
 edition = "2021"
 
@@ -19,10 +19,10 @@ tag-prefix = ""
 publish = false
 
 [workspace.dependencies]
-boring-sys = { package = "boring-sys2", version = "5.0.0-alpha.3", path = "./boring-sys" }
-boring = { package = "boring2", version = "5.0.0-alpha.3", path = "./boring" }
-tokio-boring = { package = "tokio-boring2", version = "5.0.0-alpha.3", path = "./tokio-boring" }
-compio-boring = { package = "compio-boring2", version = "5.0.0-alpha.3", path = "./compio-boring" }
+boring-sys = { package = "boring-sys2", version = "5.0.0-alpha.4", path = "./boring-sys" }
+boring = { package = "boring2", version = "5.0.0-alpha.4", path = "./boring" }
+tokio-boring = { package = "tokio-boring2", version = "5.0.0-alpha.4", path = "./tokio-boring" }
+compio-boring = { package = "compio-boring2", version = "5.0.0-alpha.4", path = "./compio-boring" }
 
 bindgen = { version = "0.72.0", default-features = false, features = ["runtime"] }
 bytes = "1"
