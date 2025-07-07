@@ -6,10 +6,10 @@
 //! ecosystem. Client connections initiated from this crate verify hostnames
 //! automatically and by default.
 //!
-//! `tokio-boring` exports this ability through [`accept`] and [`connect`]. `accept` should
+//! `compio-boring2` exports this ability through [`accept`] and [`connect`]. `accept` should
 //! be used by servers, and `connect` by clients. These augment the functionality provided by the
-//! [`boring`] crate, on which this crate is built. Configuration of TLS parameters is still
-//! primarily done through the [`boring`] crate.
+//! [`boring2`] crate, on which this crate is built. Configuration of TLS parameters is still
+//! primarily done through the [`boring2`] crate.
 #![warn(missing_docs)]
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
 
