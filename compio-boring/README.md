@@ -1,6 +1,6 @@
 # compio-boring2
 
-An implementation of SSL streams for Tokio built on top of the BoringSSL.
+An implementation of SSL streams for Compio built on top of the BoringSSL.
 
 [Documentation](https://docs.rs/compio-boring2)
 
