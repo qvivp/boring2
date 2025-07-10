@@ -10,7 +10,7 @@ First, add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-tcompio-boring2 = "5.0.0-alpha.4"
+compio-boring2 = "5.0.0-alpha.4"
 ```
 
 Then, use either `accept` or `connect` as appropriate.
