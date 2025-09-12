@@ -1,6 +1,5 @@
 # boring2
 
-[![CI](https://github.com/0x676e67/boring2/actions/workflows/ci.yml/badge.svg)](https://github.com/0x676e67/boring2/actions/workflows/ci.yml)
 [![crates.io](https://img.shields.io/crates/v/boring2.svg)](https://crates.io/crates/boring2)
 
 BoringSSL bindings for the Rust programming language and HTTP client for [wreq](https://github.com/0x676e67/wreq) built on top of it.
