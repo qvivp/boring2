@@ -25,8 +25,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Install Rust
-        run: rustup update stable && rustup default stable
+      - name: Install Rustfmt
+        run: rustup default stable && rustup component add rustfmt
       - name: Check formatting
         run: cargo fmt --all -- --check
 
@@ -38,10 +38,11 @@ jobs:
         with:
           submodules: 'recursive'
       - name: Install Rust
-        run: rustup update stable && rustup default stable
+        run: rustup update --no-self-update stable && rustup default stable && rustup component add clippy
       - name: Get rust version
         id: rust-version
-        run: echo "::set-output name=version::$(rustc --version)"
+        run: |
+          echo "version=$(rustc --version)" >> $GITHUB_OUTPUT
       - name: Cache cargo index
         uses: actions/cache@v4
         with:
@@ -157,8 +158,8 @@ jobs:
           apt_packages: gcc-arm-linux-gnueabi g++-arm-linux-gnueabi
           check_only: true
           custom_env:
-            CC: arm-linux-gnueabi-gcc
-            CXX: arm-linux-gnueabi-g++
+            CC_arm-unknown-linux-gnueabi: arm-linux-gnueabi-gcc
+            CXX_arm-unknown-linux-gnueabi: arm-linux-gnueabi-g++
             CARGO_TARGET_ARM_UNKNOWN_LINUX_GNUEABI_LINKER: arm-linux-gnueabi-g++
           extra_test_args: --workspace --exclude compio-boring2
         - thing: aarch64-linux
@@ -168,8 +169,8 @@ jobs:
           apt_packages: crossbuild-essential-arm64
           check_only: true
           custom_env:
-            CC: aarch64-linux-gnu-gcc
-            CXX: aarch64-linux-gnu-g++
+            CC_aarch64_unknown_linux_gnu: aarch64-linux-gnu-gcc
+            CXX_aarch64_unknown_linux_gnu: aarch64-linux-gnu-g++
             CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER: aarch64-linux-gnu-g++
         - thing: arm64-macos
           target: aarch64-apple-darwin
@@ -214,6 +215,10 @@ jobs:
       # run: rustup update ${{ matrix.rust }} --no-self-update && rustup default ${{ matrix.rust }}
       # shell: bash
     - run: rustup target add ${{ matrix.target }}
+    - name: Install golang
+      uses: actions/setup-go@v5
+      with:
+        go-version: '>=1.22.0'
     - name: Install target-specific APT dependencies
       if: "matrix.apt_packages != ''"
       run: sudo apt update && sudo apt install -y ${{ matrix.apt_packages }}
@@ -272,6 +277,10 @@ jobs:
     - name: Install Rust (rustup)
       run: rustup update stable --no-self-update && rustup default stable && rustup target add ${{ matrix.target }}
       shell: bash
+    - name: Install golang
+      uses: actions/setup-go@v5
+      with:
+        go-version: '>=1.22.0'
     - name: Install ${{ matrix.target }} toolchain
       run: brew tap messense/macos-cross-toolchains && brew install ${{ matrix.target }}
     - name: Set BORING_BSSL_SYSROOT
@@ -291,14 +300,10 @@ jobs:
         submodules: 'recursive'
     - name: Install Rust (rustup)
       run: rustup update stable --no-self-update && rustup default stable
-    - run: cargo test --features pq-experimental
-      name: Run `pq-experimental` tests
-    - run: cargo test --features kx-safe-default,pq-experimental
-      name: Run `kx-safe-default` tests
-    - run: cargo test --features pq-experimental,underscore-wildcards
-      name: Run `pq-experimental,underscore-wildcards` tests
-    - run: cargo test --features underscore-wildcards
-      name: Run `underscore-wildcards` tests
+    - name: Run `kx-safe-default` tests
+      run: cargo test --features kx-safe-default
+    - name: Run `underscore-wildcards` tests
+      run: cargo test --features underscore-wildcards
 
   crates:
     name: crates

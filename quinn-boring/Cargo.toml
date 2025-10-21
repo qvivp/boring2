@@ -15,11 +15,7 @@ maintenance = { status = "passively-maintained" }
 
 [features]
 default = ["runtime-tokio"]
-
 runtime-tokio = ["quinn/runtime-tokio"]
-
-# Enables experimental post-quantum crypto (https://blog.cloudflare.com/post-quantum-for-all/)
-pq-experimental = ["boring/pq-experimental"]
 
 [dependencies]
 boring = { workspace = true }
