@@ -25,7 +25,7 @@ boring = { package = "boring2", version = "5.0.0-alpha.10", path = "./boring" }
 tokio-boring = { package = "tokio-boring2", version = "5.0.0-alpha.10", path = "./tokio-boring" }
 compio-boring = { package = "compio-boring2", version = "5.0.0-alpha.10", path = "./compio-boring" }
 
-bindgen = { version = "0.72.0", default-features = false, features = ["runtime"] }
+bindgen = { version = "0.72.0", default-features = false, features = ["static"] }
 bitflags = "2.9"
 brotli = "8.0"
 bytes = "1"
